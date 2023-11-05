@@ -1,29 +1,35 @@
-import requests
+from datetime import datetime
+from utils import get_currency_rate, save_to_json
 
-url = "https://api.apilayer.com/exchangerates_data/convert?to=EUR&from=RUB&amount=10"
 
-payload = {}
-headers= {
-  "apikey": "UyjuYfUUwisIrbEveW50fYYFPWnWdKG0"
-}
+def main():
+    """
+    Основная функция программы.
+    Получает от пользователя название валюты — USD или EUR,
+    получает и выводит на экран текущий курс валюты от API.
+    Записывает данные в JSON-файл.
+    """
+    while True:
+        currency = input("Введите название валюты (USD или EUR): ").upper()
+        if currency not in ["USD", "EUR"]:
+            print("Некорректный ввод")
+            continue
 
-response = requests.request("GET", url, headers=headers, data = payload)
+        rate = get_currency_rate(currency)
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-status_code = response.status_code
-result = response.text
-print(result)
+        print(f"Курс {currency} к рублю: {rate:.2f}")
+        data = {"currency": currency, "rate": rate, "timestamp": timestamp}
+        save_to_json(data)
 
-import requests
+        choice = input("Выберите действие: (1 - продолжить, 2 - выйти) ")
+        if choice == "1":
+            continue
+        elif choice == "2":
+            break
+        else:
+            print("Некорректный ввод")
 
-url = "https://api.apilayer.com/exchangerates_data/latest?symbols={symbols}&base={base}"
 
-payload = {}
-headers= {
-  "apikey": "UyjuYfUUwisIrbEveW50fYYFPWnWdKG0"
-}
-
-response = requests.request("GET", url, headers=headers, data = payload)
-
-status_code = response.status_code
-result = response.text
-print(result)
+if __name__ == "__main__":
+    main()
